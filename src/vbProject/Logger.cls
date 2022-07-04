@@ -11,7 +11,7 @@ Attribute VB_Exposed = False
 ' VBA-ErrorHandling: Logger
 ' (c) RadiusCore Ltd - https://radiuscore.co.nz/
 '
-' Logging & Error Handler for VBA.
+' Logging for VBA.
 '
 ' @module Logger
 ' @author Andrew Pullon | andrew.pullon@radiuscore.co.nz | andrewcpullon@gmail.com
@@ -21,7 +21,7 @@ Attribute VB_Exposed = False
 ' RubberDuck Annotations
 ' https://rubberduckvba.com/ | https://github.com/rubberduck-vba/Rubberduck/
 '
-'@folder VBA-ErrorHandling
+'@folder ErrorHandling
 '@ignoremodule ProcedureNotUsed
 '' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ '
 Option Explicit
@@ -48,7 +48,6 @@ Private Type TLogger
     Console As Boolean
     ConsoleHandle As Long
     IsInitialised As Boolean
-    Err As Collection
 End Type
 
 Private This As TLogger
@@ -72,18 +71,6 @@ Public Enum VbLogLevel
     Info = 3
     Warn = 4
     Error = 5
-End Enum
-
-''
-' Whether to load or save to Cache.
-'
-' @proprty VbCache
-' @param cacheSave
-' @param cacheLoad
-''
-Public Enum VbCache
-    cacheSave = 1
-    cacheLoad = 2
 End Enum
 
 ' --------------------------------------------- '
@@ -199,91 +186,11 @@ Public Sub LogError(ByVal Message As String, Optional ByVal From As String = vbN
     Dim log_ErrorValue As String
     If Not ErrNumber = 0 Then
         log_ErrorValue = ErrNumber
-    
         ' For object errors, extract from vbObjectError and get Hex value
-        If ErrNumber < 0 Then
-            log_ErrorValue = log_ErrorValue & " (" & (ErrNumber - vbObjectError) & " / " & VBA.LCase$(VBA.Hex$(ErrNumber)) & ")"
-        End If
-        
+        If ErrNumber < 0 Then log_ErrorValue = log_ErrorValue & " (" & (ErrNumber - vbObjectError) & " / " & VBA.LCase$(VBA.Hex$(ErrNumber)) & ")"
         log_ErrorValue = log_ErrorValue & ", "
     End If
-
     log_Log VbLogLevel.Error, log_ErrorValue & Message, From
-End Sub
-
-''
-' Display error message as warning in dialogue box.
-'
-' @method ShowWarn
-' @param {String} Message
-' @param {String} [ErrDescription = ""]
-' @param {String} [ErrSource = ""]
-' @param {Long} [ErrNumber = 0]
-' @param {Boolean} [Log = True]
-''
-Public Sub ShowWarn(ByVal Message As String, Optional ByVal ErrDescription As String = vbNullString, Optional ByVal ErrSource As String = vbNullString, Optional ByVal ErrNumber As Long = 0, Optional ByVal Log As Boolean = True)
-    If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."
-    If Log Then
-        If Not (ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0) Then LogError VBA.Replace(ErrDescription, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
-        LogWarn Message, ErrSource
-    End If
-    VBA.MsgBox Message & _
-               VBA.IIf(ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0, vbNullString, vbNewLine & vbNewLine & "---Error Information---" & vbNewLine) & _
-               VBA.IIf(ErrDescription = vbNullString, vbNullString, VBA.Replace(ErrDescription, vbNewLine, " ") & vbNewLine) & _
-               VBA.IIf(ErrSource = vbNullString, vbNullString, "[" & ErrSource & "]" & vbNewLine) & _
-               VBA.IIf(ErrNumber = 0, vbNullString, "(" & ErrNumber - vbObjectError & " / " & ErrNumber & VBA.IIf(ErrNumber < 0, " / " & VBA.LCase$(VBA.Hex$(ErrNumber)), vbNullString) & ")"), _
-               vbExclamation + vbOKOnly, "Warning"
-End Sub
-
-''
-' Display error message in dialogue box.
-'
-' @method ShowError
-' @param {String} Message
-' @param {String} [From = ""]
-' @param {Long} [ErrNumber = 0]
-' @param {Boolean} [Log = True]
-''
-Public Sub ShowError(ByVal Message As String, Optional ByVal ErrDescription As String = vbNullString, Optional ByVal ErrSource As String = vbNullString, Optional ByVal ErrNumber As Long = 0, Optional ByVal Log As Boolean = True)
-    If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."
-    If Log Then LogError VBA.Replace(Message, vbNewLine, VBA.Chr$(32)) & VBA.Chr$(32) & VBA.Replace(Err.Description, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
-    VBA.MsgBox Message & vbNewLine & _
-               VBA.IIf(ErrDescription = vbNullString, vbNullString, vbNewLine & ErrDescription & vbNewLine) & _
-               VBA.IIf(ErrSource = vbNullString, vbNullString, "[" & ErrSource & "]" & vbNewLine) & _
-               VBA.IIf(ErrNumber = 0, vbNullString, "(" & ErrNumber - vbObjectError & " / " & ErrNumber & VBA.IIf(ErrNumber < 0, " / " & VBA.LCase$(VBA.Hex$(ErrNumber)), vbNullString) & ")" & vbNewLine) & _
-               VBA.IIf(ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0, vbNullString, vbNewLine & "If this error is persistent please contact the developer."), _
-               vbCritical + vbOKOnly, "Error"
-End Sub
-
-''
-' Cache Excel Error Object (`Err`) and reload it, so the error can be persistent through methods
-' that require error handling to be used.
-'
-' @method ErrCache
-' @param {VbCache} Operation | Whether to save to or load from the cache.
-''
-Public Sub ErrCache(ByVal Operation As VbCache)
-    Select Case Operation
-    Case VbCache.cacheSave
-        Set This.Err = New Collection ' Reset cache.
-        With This.Err
-            .Add Err.Description, "Description"
-            .Add Err.HelpContext, "HelpContext"
-            .Add Err.HelpFile, "HelpFile"
-            .Add Err.Number, "Number"
-            .Add Err.Source, "Source"
-        End With
-    Case VbCache.cacheLoad
-        If Not This.Err Is Nothing Then
-            With This.Err
-                Err.Description = .Item("Description")
-                Err.HelpContext = .Item("HelpContext")
-                Err.HelpFile = .Item("HelpFile")
-                Err.Number = .Item("Number")
-                Err.Source = .Item("Source")
-            End With
-        End If
-    End Select
 End Sub
 
 ' ============================================= '
@@ -377,14 +284,13 @@ Private Sub log_OpenConsole()
     
     This.ConsoleHandle = FindWindow("ConsoleWindowClass", This.LogTitle)        ' Check if logging window already exists.
     If This.ConsoleHandle = 0 Then
-        Shell "PowerShell.exe -NoExit -Command " & _
+        Shell "PowerShell.exe -WindowStyle Normal -NoExit -Command " & _
             "$Host.UI.RawUI.WindowTitle = '" & This.LogTitle & "'; " & _
             "get-content '" & This.LogFilePath & "' -Wait"                      ' Open PowerShell window for console logging.
         Application.Wait VBA.Now + VBA.TimeValue("0:00:02")                     ' Wait to open.
-        This.ConsoleHandle = FindWindow("ConsoleWindowClass", This.LogTitle)    ' Get handle for window just opened. , using title to find it.
-    Else
-        SetForegroundWindow This.ConsoleHandle                                  ' Window already open, bring to foreground.
+        This.ConsoleHandle = FindWindow("ConsoleWindowClass", This.LogTitle)    ' Get handle for window just opened using title to find it.
     End If
+    SetForegroundWindow This.ConsoleHandle                                      ' Bring console to foreground.
     Exit Sub
     
 log_OpenConsole:

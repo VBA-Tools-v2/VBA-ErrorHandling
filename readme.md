@@ -19,7 +19,7 @@ __Build__
 # Usage
 __Manual__
 
-To manually add  VBA-ErrorHandling to a VBA project, import __either__ [ErrorHandler.bas](/src/vbProject/ErrorHandler.bas) _or_ [Logger.cls](/src/vbProject/Logger.cls) to the project. If `Logger.cls` is being used, include the requred files from [VBA-Scripting](https://github.com/VBA-Tools-v2/VBA-Scripting/) ([FileSystemObject.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/FileSystemObject.cls) & [TextStream.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/TextStream.cls)) or include a reference to `Microsoft Scripting Runtime`.
+To manually add  VBA-ErrorHandling to a VBA project, import [ErrorHandler.bas](/src/vbProject/ErrorHandler.bas) and optionally, if logging is desired, [Logger.cls](/src/vbProject/Logger.cls) to the project. If `Logger.cls` is being used, include the requred files from [VBA-Scripting](https://github.com/VBA-Tools-v2/VBA-Scripting/) ([FileSystemObject.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/FileSystemObject.cls) & [TextStream.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/TextStream.cls)) or include a reference to `Microsoft Scripting Runtime`.
 
 __VBA-Git__
 
@@ -28,21 +28,27 @@ To easily include VBA-ErrorHandling in any VBA project, use VBA-Git to build the
 ```
 "VBA-ErrorHandler": {
     "git": "https://github.com/VBA-Tools-v2/vba-errorhandler/",
-    "tag": "v1.0.0",
+    "tag": "v1.1.0",
     "key": "{readonly personal access token}"
-    "src": ["Logger.cls"]
+    "src": ["ErrorHandler.bas"]
 }
 ```
-
 
 # Example
 
 ```VB.net
-Dim xl_Log As Logger
-Set xl_Log = New Logger
-xl_Log.Initialise LogFilePath:="C:/VBA-Log.log", LogTitle:="Test Log"
-xl_Log.LogThreshold = Info
+ErrorHandler.ApplicationName = "VBA-ErrorHandling"
+' Enable logging by attaching a Logger to the Error Handler.
+Set ErrorHandler.Log = New Logger
+ErrorHandler.Log.Initialise LogFilePath:="C:/VBA-Log.log", LogTitle:="Test Log"
+ErrorHandler.Log.LogThreshold = Info
 
-xl_Log.LogWarn "Logging has started to the target file.", "ModuleName.MethodName"
+' Show a warning error, which will log if a Logger is attached.
+ErrorHandler.ShowWarn "An error has occured.", Err.Description, Err.Source, Err.Number, True
+' -> 2022-07-01 21:37:50.00|ERROR|{Err.Source}|{Err.Number}, {Err.Description}.
+' -> 2022-07-01 21:37:50.00|WARN |{Err.Source}|An error has occured.
+
+' Directly log a warning using attached Logger.
+ErrorHandler.Log.LogWarn "Logging has started to the target file.", "ModuleName.MethodName"
 ' -> 2022-07-01 21:37:50.00|WARN |ModuleName.MethodName|Logging has started to the target file.
 ```
