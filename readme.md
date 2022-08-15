@@ -49,6 +49,6 @@ ErrorHandler.ShowWarn "An error has occured.", Err.Description, Err.Source, Err.
 ' -> 2022-07-01 21:37:50.00|WARN |{Err.Source}|An error has occured.
 
 ' Directly log a warning using attached Logger.
-ErrorHandler.Log.LogWarn "Logging has started to the target file.", "ModuleName.MethodName"
+ErrorHandler.LogWarn "Logging has started to the target file.", "ModuleName.MethodName"
 ' -> 2022-07-01 21:37:50.00|WARN |ModuleName.MethodName|Logging has started to the target file.
 ```
