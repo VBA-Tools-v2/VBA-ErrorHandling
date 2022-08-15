@@ -143,6 +143,59 @@ Public Sub ErrCache(ByVal Operation As VbCache)
 End Sub
 
 ''
+' @method LogTrace
+' @param {String} Message
+' @param {String} [From = ""]
+''
+Public Sub LogTrace(ByVal Message As String, Optional ByVal From As String = vbNullString)
+    If ErrorHandler.IsLoggingEnabled Then This.Log.Log VbLogLevel.vbLogTrace, Message, From
+End Sub
+
+''
+' @method LogDebug
+' @param {String} Message
+' @param {String} [From = ""]
+''
+Public Sub LogDebug(ByVal Message As String, Optional ByVal From As String = vbNullString)
+    If ErrorHandler.IsLoggingEnabled Then This.Log.Log VbLogLevel.vbLogDebug, Message, From
+End Sub
+
+''
+' @method LogInfo
+' @param {String} Message
+' @param {String} [From = ""]
+''
+Public Sub LogInfo(ByVal Message As String, Optional ByVal From As String = vbNullString)
+    If ErrorHandler.IsLoggingEnabled Then This.Log.Log VbLogLevel.vbLogInfo, Message, From
+End Sub
+
+''
+' @method LogWarning
+' @param {String} Message
+' @param {String} [From = ""]
+''
+Public Sub LogWarn(ByVal Message As String, Optional ByVal From As String = vbNullString)
+    If ErrorHandler.IsLoggingEnabled Then This.Log.Log VbLogLevel.vbLogWarn, Message, From
+End Sub
+
+''
+' @method LogError
+' @param {String} Message
+' @param {String} [From = ""]
+' @param {Long} [ErrNumber = 0]
+''
+Public Sub LogError(ByVal Message As String, Optional ByVal From As String = vbNullString, Optional ByVal ErrNumber As Long = 0)
+    Dim log_ErrorValue As String
+    If Not ErrNumber = 0 Then
+        log_ErrorValue = ErrNumber
+        ' For object errors, extract from vbObjectError and get Hex value
+        If ErrNumber < 0 Then log_ErrorValue = log_ErrorValue & " (" & (ErrNumber - vbObjectError) & " / " & VBA.LCase$(VBA.Hex$(ErrNumber)) & ")"
+        log_ErrorValue = log_ErrorValue & ", "
+    End If
+    If ErrorHandler.IsLoggingEnabled Then This.Log.Log VbLogLevel.vbLogError, log_ErrorValue & Message, From
+End Sub
+
+''
 ' Display error message as warning in dialogue box.
 '
 ' @method ShowWarn

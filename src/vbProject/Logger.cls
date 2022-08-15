@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 ' @module Logger
 ' @author Andrew Pullon | andrew.pullon@radiuscore.co.nz | andrewcpullon@gmail.com
 ' @license MIT (http://www.opensource.org/licenses/mit-license.php)
-' @depend FileSystemObject, TextStream
+' @depend ErrorHandler, FileSystemObject, TextStream
 '' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ '
 ' RubberDuck Annotations
 ' https://rubberduckvba.com/ | https://github.com/rubberduck-vba/Rubberduck/
@@ -120,76 +120,20 @@ End Property
 ' ============================================= '
 
 ''
-' @method LogTrace
-' @param {String} Message
-' @param {String} [From = ""]
-''
-Public Sub LogTrace(ByVal Message As String, Optional ByVal From As String = vbNullString)
-    log_Log VbLogLevel.Trace, Message, From
-End Sub
-
-''
-' @method LogDebug
-' @param {String} Message
-' @param {String} [From = ""]
-''
-Public Sub LogDebug(ByVal Message As String, Optional ByVal From As String = vbNullString)
-    log_Log VbLogLevel.Debugg, Message, From
-End Sub
-
-''
-' @method LogInfo
-' @param {String} Message
-' @param {String} [From = ""]
-''
-Public Sub LogInfo(ByVal Message As String, Optional ByVal From As String = vbNullString)
-    log_Log VbLogLevel.Info, Message, From
-End Sub
-
-''
-' @method LogWarning
-' @param {String} Message
-' @param {String} [From = ""]
-''
-Public Sub LogWarn(ByVal Message As String, Optional ByVal From As String = vbNullString)
-    log_Log VbLogLevel.Warn, Message, From
-End Sub
-
-''
-' @method LogError
-' @param {String} Message
-' @param {String} [From = ""]
-' @param {Long} [ErrNumber = 0]
-''
-Public Sub LogError(ByVal Message As String, Optional ByVal From As String = vbNullString, Optional ByVal ErrNumber As Long = 0)
-    Dim log_ErrorValue As String
-    If Not ErrNumber = 0 Then
-        log_ErrorValue = ErrNumber
-        ' For object errors, extract from vbObjectError and get Hex value
-        If ErrNumber < 0 Then log_ErrorValue = log_ErrorValue & " (" & (ErrNumber - vbObjectError) & " / " & VBA.LCase$(VBA.Hex$(ErrNumber)) & ")"
-        log_ErrorValue = log_ErrorValue & ", "
-    End If
-    log_Log VbLogLevel.Error, log_ErrorValue & Message, From
-End Sub
-
-' ============================================= '
-' Private Methods
-' ============================================= '
-
-''
-' @method log_Log
+' Log message.
+'
+' @method Log
 ' @param {VbLogLevel} Level
 ' @param {String} Message
 ' @param {String} [From = ""]
 ''
-Private Sub log_Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVal From As String = vbNullString)
+Public Sub Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVal From As String = vbNullString)
     On Error GoTo log_ErrorHandling
-    If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."
-    If LogThreshold = VbLogLevel.Off Or Level < LogThreshold Then Exit Sub      ' Exit if log threshold is not high enough.
-    If VBA.FileLen(This.LogFilePath) >= 1024000 Then log_UpdateLogFiles         ' Create new log file if size limit is met.
+    If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."  ' Exit if class is not initialised.
     If Me.LogThreshold = VbLogLevel.vbLogOff Or Level < Me.LogThreshold Then Exit Sub   ' Exit if log threshold is not high enough.
+    If VBA.FileLen(This.LogFilePath) >= 1024000 Then log_UpdateLogFiles                 ' Create new log file if size limit is met.
 #If Not Mac Then
-    If This.Console And This.ConsoleHandle = -1 Then log_OpenConsole            ' Show log in console, if enabled.
+    If This.Console And This.ConsoleHandle = -1 Then log_OpenConsole                    ' Show log in console, if enabled.
 #End If
     
     Dim lg_Text As String
@@ -205,6 +149,10 @@ Private Sub log_Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional
 log_ErrorHandling:
     Debug.Print "Error Logging (" & Err.Number & ": " & Err.Description & ")"   ' Suppress any errors while logging. Don't want to break application due to this.
 End Sub
+
+' ============================================= '
+' Private Methods
+' ============================================= '
 
 ''
 ' Update log files when:
