@@ -207,9 +207,9 @@ End Sub
 ''
 Public Sub ShowWarn(ByVal Message As String, Optional ByVal ErrDescription As String = vbNullString, Optional ByVal ErrSource As String = vbNullString, Optional ByVal ErrNumber As Long = 0, Optional ByVal Log As Boolean = True)
     ' Log if possible.
-    If Log And Not This.Log Is Nothing Then
-        If Not (ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0) Then This.Log.LogError VBA.Replace(ErrDescription, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
-        This.Log.LogWarn Message, ErrSource
+    If Log And ErrorHandler.IsLoggingEnabled Then
+        If Not (ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0) Then LogError VBA.Replace(ErrDescription, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
+        LogWarn Message, ErrSource
     End If
     ' Show error message.
     VBA.MsgBox Message & _
@@ -232,8 +232,8 @@ End Sub
 ''
 Public Sub ShowError(ByVal Message As String, Optional ByVal ErrDescription As String = vbNullString, Optional ByVal ErrSource As String = vbNullString, Optional ByVal ErrNumber As Long = 0, Optional ByVal Log As Boolean = True)
     ' Log if possible.
-    If Log And Not This.Log Is Nothing Then
-        If Log Then This.Log.LogError VBA.Replace(Message, vbNewLine, VBA.Chr$(32)) & VBA.Chr$(32) & VBA.Replace(Err.Description, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
+    If Log And ErrorHandler.IsLoggingEnabled Then
+        If Log Then LogError VBA.Replace(Message, vbNewLine, VBA.Chr$(32)) & VBA.Chr$(32) & VBA.Replace(Err.Description, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
     End If
     ' Show error message.
     VBA.MsgBox Message & vbNewLine & _
