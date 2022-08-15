@@ -45,6 +45,22 @@ Private This As TErrorHandler
 Public Enum VbCache
     cacheSave = 1
     cacheLoad = 2
+
+''
+' Log Levels.
+'
+' @property vbLogLevel
+' @param Off        @param Info
+' @param Trace/All  @param Warn
+' @param Debug      @param Error
+''
+Public Enum VbLogLevel
+    vbLogOff = 0
+    vbLogTrace = 1
+    vbLogDebug = 2
+    vbLogInfo = 3
+    vbLogWarn = 4
+    vbLogError = 5
 End Enum
 
 ' --------------------------------------------- '

@@ -53,27 +53,6 @@ End Type
 Private This As TLogger
 
 ' --------------------------------------------- '
-' Types
-' --------------------------------------------- '
-
-''
-' Log Levels.
-'
-' @property vbLogLevel
-' @param Off        @param Info
-' @param Trace/All  @param Warn
-' @param Debug      @param Error
-''
-Public Enum VbLogLevel
-    Off = 0
-    Trace = 1
-    Debugg = 2
-    Info = 3
-    Warn = 4
-    Error = 5
-End Enum
-
-' --------------------------------------------- '
 ' Public Properties
 ' --------------------------------------------- '
 
@@ -103,7 +82,7 @@ End Property
 ' @default False
 ''
 Public Property Get LogEnabled() As Boolean
-    LogEnabled = Not (LogThreshold = VbLogLevel.Off)
+    LogEnabled = Not (LogThreshold = VbLogLevel.vbLogOff)
 End Property
 
 ''
@@ -208,6 +187,7 @@ Private Sub log_Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional
     If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."
     If LogThreshold = VbLogLevel.Off Or Level < LogThreshold Then Exit Sub      ' Exit if log threshold is not high enough.
     If VBA.FileLen(This.LogFilePath) >= 1024000 Then log_UpdateLogFiles         ' Create new log file if size limit is met.
+    If Me.LogThreshold = VbLogLevel.vbLogOff Or Level < Me.LogThreshold Then Exit Sub   ' Exit if log threshold is not high enough.
 #If Not Mac Then
     If This.Console And This.ConsoleHandle = -1 Then log_OpenConsole            ' Show log in console, if enabled.
 #End If
@@ -307,15 +287,15 @@ End Sub
 ''
 Private Function log_LogLevelToText(ByVal Level As VbLogLevel) As String
     Select Case Level
-    Case VbLogLevel.Trace
+    Case VbLogLevel.vbLogTrace
         log_LogLevelToText = "Trace"
-    Case VbLogLevel.Debugg
+    Case VbLogLevel.vbLogDebug
         log_LogLevelToText = "Debug"
-    Case VbLogLevel.Info
+    Case VbLogLevel.vbLogInfo
         log_LogLevelToText = "Info "
-    Case VbLogLevel.Warn
+    Case VbLogLevel.vbLogWarn
         log_LogLevelToText = "WARN "
-    Case VbLogLevel.Error
+    Case VbLogLevel.vbLogError
         log_LogLevelToText = "ERROR"
     End Select
 End Function
