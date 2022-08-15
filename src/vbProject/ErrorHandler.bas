@@ -43,8 +43,9 @@ Private This As TErrorHandler
 ' @param cacheLoad
 ''
 Public Enum VbCache
-    cacheSave = 1
-    cacheLoad = 2
+    vbCacheSave = 1
+    vbCacheLoad = 2
+End Enum
 
 ''
 ' Log Levels.
@@ -119,7 +120,7 @@ End Property
 ''
 Public Sub ErrCache(ByVal Operation As VbCache)
     Select Case Operation
-    Case VbCache.cacheSave
+    Case VbCache.vbCacheSave
         Set This.Err = New Collection ' Reset cache.
         With This.Err
             .Add Err.Description, "Description"
@@ -128,7 +129,7 @@ Public Sub ErrCache(ByVal Operation As VbCache)
             .Add Err.Number, "Number"
             .Add Err.Source, "Source"
         End With
-    Case VbCache.cacheLoad
+    Case VbCache.vbCacheLoad
         If Not This.Err Is Nothing Then
             With This.Err
                 Err.Description = .Item("Description")
