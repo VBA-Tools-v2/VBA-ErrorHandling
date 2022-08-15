@@ -103,7 +103,7 @@ Public Property Get Log() As Object
     Set Log = This.Log
 End Property
 Public Property Set Log(ByVal Value As Object)
-    If Not VBA.TypeName(Value) = "Logger" Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."
+    If Not VBA.TypeName(Value) = "Logger" Then Err.Raise 13, "ErrorHandler", "Type mismatch"
     Set This.Log = Value
 End Property
 
