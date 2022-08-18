@@ -103,7 +103,7 @@ Public Property Get Log() As Object
     Set Log = This.Log
 End Property
 Public Property Set Log(ByVal Value As Object)
-    If Not VBA.TypeName(Value) = "Logger" Then Err.Raise 13, "ErrorHandler", "Type mismatch"
+    If Not VBA.TypeName(Value) = "Logger" And Not Value Is Nothing Then Err.Raise 13, "ErrorHandler", "Type mismatch"
     Set This.Log = Value
 End Property
 
