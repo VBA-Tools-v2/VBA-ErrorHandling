@@ -208,14 +208,14 @@ End Sub
 Public Sub ShowWarn(ByVal Message As String, Optional ByVal ErrDescription As String = vbNullString, Optional ByVal ErrSource As String = vbNullString, Optional ByVal ErrNumber As Long = 0, Optional ByVal Log As Boolean = True)
     ' Log if possible.
     If Log And ErrorHandler.IsLoggingEnabled Then
-        If Not (ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0) Then LogError VBA.Replace(ErrDescription, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
+        If Not (ErrDescription = vbNullString And ErrNumber = 0) Then LogError VBA.Replace(ErrDescription, vbNewLine, VBA.Chr$(32)), ErrSource, ErrNumber
         LogWarn Message, ErrSource
     End If
     ' Show error message.
     VBA.MsgBox Message & _
-               VBA.IIf(ErrDescription = vbNullString And ErrSource = vbNullString And ErrNumber = 0, vbNullString, vbNewLine & vbNewLine & "---Error Information---" & vbNewLine) & _
+               VBA.IIf(ErrDescription = vbNullString And ErrNumber = 0, vbNullString, vbNewLine & vbNewLine & "---Error Information---" & vbNewLine) & _
                VBA.IIf(ErrDescription = vbNullString, vbNullString, VBA.Replace(ErrDescription, vbNewLine, " ") & vbNewLine) & _
-               VBA.IIf(ErrSource = vbNullString, vbNullString, "[" & ErrSource & "]" & vbNewLine) & _
+               VBA.IIf(ErrSource = vbNullString Or (ErrDescription = vbNullString And ErrNumber = 0), vbNullString, "[" & ErrSource & "]" & vbNewLine) & _
                VBA.IIf(ErrNumber = 0, vbNullString, "(" & ErrNumber - vbObjectError & " / " & ErrNumber & VBA.IIf(ErrNumber < 0, " / " & VBA.LCase$(VBA.Hex$(ErrNumber)), vbNullString) & ")"), _
                vbExclamation + vbOKOnly, VBA.IIf(This.ApplicationName = vbNullString, vbNullString, This.ApplicationName & " | ") & "Warning"
 End Sub
