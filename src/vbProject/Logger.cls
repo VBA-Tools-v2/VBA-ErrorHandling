@@ -128,7 +128,6 @@ End Property
 ' @param {String} [From = ""]
 ''
 Public Sub Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVal From As String = vbNullString)
-    On Error GoTo log_ErrorHandling
     If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."  ' Exit if class is not initialised.
     If Me.LogThreshold = VbLogLevel.vbLogOff Or Level < Me.LogThreshold Then Exit Sub   ' Exit if log threshold is not high enough.
     If VBA.FileLen(This.LogFilePath) >= 1024000 Then log_UpdateLogFiles                 ' Create new log file if size limit is met.
@@ -144,10 +143,6 @@ Public Sub Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVa
     
     If This.Immediate Then Debug.Print lg_Text                                  ' Log to immediate window.
     This.LogFile.WriteLine lg_Text                                              ' Log to file.
-    Exit Sub
-    
-log_ErrorHandling:
-    Debug.Print "Error Logging (" & Err.Number & ": " & Err.Description & ")"   ' Suppress any errors while logging. Don't want to break application due to this.
 End Sub
 
 ' ============================================= '
