@@ -19,7 +19,7 @@ __Build__
 # Usage
 __Manual__
 
-To manually add  VBA-ErrorHandling to a VBA project, import [ErrorHandler.bas](/src/vbProject/ErrorHandler.bas) and optionally, if logging is desired, [Logger.cls](/src/vbProject/Logger.cls) to the project. If `Logger.cls` is being used, include the requred files from [VBA-Scripting](https://github.com/VBA-Tools-v2/VBA-Scripting/) ([FileSystemObject.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/FileSystemObject.cls) & [TextStream.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/TextStream.cls)) or include a reference to `Microsoft Scripting Runtime`.
+To manually add  VBA-ErrorHandling to a VBA project, import [ErrorHandler.bas](/src/vbProject/ErrorHandler.bas) and optionally, if logging is desired, [Logger.cls](/src/vbProject/Logger.cls) to the project. If `Logger.cls` is being used, include the required files from [VBA-Scripting](https://github.com/VBA-Tools-v2/VBA-Scripting/) ([FileSystemObject.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/FileSystemObject.cls) & [TextStream.cls](https://github.com/VBA-Tools-v2/VBA-Scripting/blob/master/src/vbProject/Scripting/TextStream.cls)) or include a reference to `Microsoft Scripting Runtime`.
 
 __VBA-Git__
 
@@ -27,9 +27,8 @@ To easily include VBA-ErrorHandling in any VBA project, use VBA-Git to build the
 
 ```
 "VBA-ErrorHandler": {
-    "git": "https://github.com/VBA-Tools-v2/vba-errorhandler/",
-    "tag": "v1.1.0",
-    "key": "{readonly personal access token}"
+    "git": "https://github.com/VBA-Tools-v2/VBA-ErrorHandling/",
+    "tag": "v1.2.3",
     "src": ["ErrorHandler.bas"]
 }
 ```
@@ -44,9 +43,9 @@ ErrorHandler.Log.Initialise LogFilePath:="C:/VBA-Log.log", LogTitle:="Test Log"
 ErrorHandler.Log.LogThreshold = Info
 
 ' Show a warning error, which will log if a Logger is attached.
-ErrorHandler.ShowWarn "An error has occured.", Err.Description, Err.Source, Err.Number, True
+ErrorHandler.ShowWarn "An error has occurred.", Err.Description, Err.Source, Err.Number, True
 ' -> 2022-07-01 21:37:50.00|ERROR|{Err.Source}|{Err.Number}, {Err.Description}.
-' -> 2022-07-01 21:37:50.00|WARN |{Err.Source}|An error has occured.
+' -> 2022-07-01 21:37:50.00|WARN |{Err.Source}|An error has occurred.
 
 ' Directly log a warning using attached Logger.
 ErrorHandler.LogWarn "Logging has started to the target file.", "ModuleName.MethodName"
