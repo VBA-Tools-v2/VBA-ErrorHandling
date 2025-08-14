@@ -1,0 +1,60 @@
+{
+    "project": {
+        "name": "VBA-ErrorHandling",
+        "target": "xlam",
+        "authors": "RadiusCore Ltd",
+        "version": "1.2.3",
+        "description": "Logging and error handling for VBA projects."
+    },
+    "components": {
+        "vba": true,
+        "ribbon": false,
+        "worksheet": false,
+        "customxml": false
+    },
+    "structure": {
+        "root": "..\\"
+		"src": "..\\src\\",
+        "build": "..\\build\\"
+    },
+    "references": {
+    },
+	"dependencies": {
+		"VBA-Scripting": {
+			"git": "https://github.com/VBA-Tools-v2/vba-scripting/",
+			"tag": "v0.2.3",
+			"src": ["FileSystemObject.cls", "TextStream.cls"]
+		}
+	},
+	"release": {
+		"readonly": false,
+		"hackdetection": false,
+		"vbatamper": false,
+		"obfuscate": {
+			"enabled": false,
+			"backup": true,
+			"noiselength": 50
+		},
+		"unviewable": {
+			"enabled": false,
+			"backup": true,
+			"type": 2,
+			"level": 4,
+			"clean": true,
+			"stamp": true,
+			"copyright": true,
+			"multilayer": true,
+			"codeshield": true,
+			"vbehidden": false
+		},
+		"customcompression": false,
+		"digitalsignature": {
+			"enabled": false,
+			"certname": ""
+		},
+		"encryption": {
+			"enabled": false,
+			"password": ""
+		}
+	}
+}
