@@ -112,6 +112,27 @@ End Property
 ' ============================================= '
 
 ''
+' Append the current error source to `CurrentSource` to re-raise an error with, chaining the current procuedure's
+' name onto the error's existing `Source` as a breadcrumb of the call path it bubbled up through.
+'
+' Guards against:
+'  - No prior source (blank)
+'  - Prior source equal to the project name (uses `This.ApplicationName`)
+'  - Prior source equal to `CurrentSource`
+'
+' @method AppendErrorSource
+' @param {String} CurrentSource | Name of the procedure re-raising the error.
+' @return {String}
+''
+Public Function AppendErrorSource(ByVal CurrentSource As String) As String
+    If VBA.Replace(Err.Source, "_", vbNullString) = VBA.Replace(This.ApplicationName, " ", vbNullString) Or Err.Source = vbNullString Or Err.Source = CurrentSource Then
+        AppendErrorSource = CurrentSource
+    Else
+        AppendErrorSource = CurrentSource & "." & Err.Source
+    End If
+End Function
+
+''
 ' Cache Excel Error Object (`Err`) and reload it, so the error can be persistent through methods
 ' that require error handling to be used.
 '
