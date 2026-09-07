@@ -3,7 +3,7 @@
         "name": "VBA-ErrorHandling",
         "target": "xlam",
         "authors": "RadiusCore Ltd",
-        "version": "1.2.3",
+        "version": "1.2.4",
         "description": "Logging and error handling for VBA projects."
     },
     "components": {
