@@ -135,32 +135,40 @@ End Function
 ''
 ' Cache Excel Error Object (`Err`) and reload it, so the error can be persistent through methods
 ' that require error handling to be used.
+'  -> Cached errors are stacked, so Save/Load pairs can be nested.
+'  -> Load restores (and removes) the most recently saved error.
 '
 ' @method ErrCache
 ' @param {rcCache} Operation | Whether to save to or load from the cache.
 ''
 Public Sub ErrCache(ByVal Operation As VbCache)
+    Dim cache_Error As Collection
+    If This.Err Is Nothing Then Set This.Err = New Collection
     Select Case Operation
     Case VbCache.vbCacheSave
-        Set This.Err = New Collection ' Reset cache.
-        With This.Err
+        Set cache_Error = New Collection
+        With cache_Error
             .Add Err.Description, "Description"
             .Add Err.HelpContext, "HelpContext"
             .Add Err.HelpFile, "HelpFile"
             .Add Err.Number, "Number"
             .Add Err.Source, "Source"
         End With
+        This.Err.Add cache_Error
     Case VbCache.vbCacheLoad
-        If Not This.Err Is Nothing Then
-            With This.Err
+        If This.Err.Count > 0 Then
+            Set cache_Error = This.Err.Item(This.Err.Count) ' Get latest error from stack.
+            With cache_Error
                 Err.Description = .Item("Description")
                 Err.HelpContext = .Item("HelpContext")
                 Err.HelpFile = .Item("HelpFile")
                 Err.Number = .Item("Number")
                 Err.Source = .Item("Source")
             End With
+            This.Err.Remove This.Err.Count  ' Remove error from stack, it has been successfully restored.
         End If
     End Select
+    Set cache_Error = Nothing
 End Sub
 
 ''
