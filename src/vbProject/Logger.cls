@@ -128,8 +128,10 @@ End Property
 ' @param {String} [From = ""]
 ''
 Public Sub Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVal From As String = vbNullString)
-    If Not This.IsInitialised Then Err.Raise 1004, "Logger", "Application-defined or object-defined error (class not intialised)."  ' Exit if class is not initialised.
+    If Not This.IsInitialised Then Exit Sub                                             ' Exit if class is not initialised.
     If Me.LogThreshold = VbLogLevel.vbLogOff Or Level < Me.LogThreshold Then Exit Sub   ' Exit if log threshold is not high enough.
+    ErrorHandler.ErrCache vbCacheSave: On Error GoTo lg_ErrorHandling                   ' Cache existing error, & enable error handling.
+    
     If VBA.FileLen(This.LogFilePath) >= 1024000 Then log_UpdateLogFiles                 ' Create new log file if size limit is met.
 #If Not Mac Then
     If This.Console And This.ConsoleHandle = -1 Then log_OpenConsole                    ' Show log in console, if enabled.
@@ -143,6 +145,13 @@ Public Sub Log(ByVal Level As VbLogLevel, ByVal Message As String, Optional ByVa
     
     If This.Immediate Then Debug.Print lg_Text                                  ' Log to immediate window.
     This.LogFile.WriteLine lg_Text                                              ' Log to file.
+
+lg_Exit:
+    ErrorHandler.ErrCache vbCacheLoad
+    Exit Sub
+    
+lg_ErrorHandling:
+    Resume lg_Exit ' Swallow logging errors. Use `Resume` here so the restored `Err` object isn't lost on exit.
 End Sub
 
 ' ============================================= '
