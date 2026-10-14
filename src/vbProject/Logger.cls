@@ -179,7 +179,7 @@ Private Sub log_UpdateLogFiles()
     
     If This.LogFile Is Nothing Then
         ' Add `new instance` line breaks to existing log file.
-        Set This.LogFile = log_FSO.OpenTextFile(This.LogFilePath, ForAppending, True, TristateFalse)
+        Set This.LogFile = log_FSO.OpenTextFile(FileName:=This.LogFilePath, Mode:=ForAppending, Create:=True, Format:=TristateFalse)
         This.LogFile.WriteBlankLines 1
         This.LogFile.WriteLine "----------" & This.LogTitle & "----------"
     Else
@@ -197,10 +197,12 @@ Private Sub log_UpdateLogFiles()
                     End If
                 Next log_Long
                 This.LogFile.CloseFile
-                Name This.LogFilePath As .BuildPath(.GetParentFolderName(This.LogFilePath), .GetBaseName(This.LogFilePath)) & ".0." & .GetExtensionName(This.LogFilePath)
+                On Error Resume Next    ' Rename could fail if log file is locked by another process.
+                    .MoveFile Source:=This.LogFilePath, Destination:=.BuildPath(.GetParentFolderName(This.LogFilePath), .GetBaseName(This.LogFilePath)) & ".0." & .GetExtensionName(This.LogFilePath)
+                On Error GoTo 0
             End If
-            ' Create new, empty text file.
-            Set This.LogFile = log_FSO.CreateTextFile(This.LogFilePath, True, False)
+            ' Open log file. New if successfully rotated, otherwise continue appending to the existing file.
+            Set This.LogFile = log_FSO.OpenTextFile(FileName:=This.LogFilePath, Mode:=ForAppending, Create:=True, Format:=TristateFalse)
         End With
     End If
 End Sub
